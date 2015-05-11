@@ -22,29 +22,21 @@ func (g *group) Entities() []Entity {
 }
 
 func (g *group) HandleEntity(entity Entity) {
-	if g.matcher.Matches(entity) {
-		g.entities = append(g.entities, entity)
+	i := findEntity(g.entities, entity)
+	if i == -1 {
+		if g.matcher.Matches(entity) {
+			g.entities = append(g.entities, entity)
+		}
 	} else {
-		g.removeEntity(entity)
+		g.removeEntity(i)
 	}
 }
 
 func (g *group) ContainsEntity(entity Entity) bool {
-	i := findEntity(g.entities, entity)
-	if i == -1 {
+	if findEntity(g.entities, entity) == -1 {
 		return false
 	}
 	return true
-}
-
-func (g *group) removeEntity(entity Entity) {
-	i := findEntity(g.entities, entity)
-	if i == -1 {
-		panic("TODO")
-	}
-	copy(g.entities[i:], g.entities[i+1:])
-	g.entities[len(g.entities)-1] = nil
-	g.entities = g.entities[:len(g.entities)-1]
 }
 
 func findEntity(entities []Entity, entity Entity) int {
@@ -54,4 +46,10 @@ func findEntity(entities []Entity, entity Entity) int {
 		}
 	}
 	return -1
+}
+
+func (g *group) removeEntity(i int) {
+	copy(g.entities[i:], g.entities[i+1:])
+	g.entities[len(g.entities)-1] = nil
+	g.entities = g.entities[:len(g.entities)-1]
 }

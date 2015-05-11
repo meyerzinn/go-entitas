@@ -38,6 +38,15 @@ func TestGroup(t *testing.T) {
 		})
 
 		Convey("When non-matching entity is added", func() {
+			e1.RemoveComponent(IndexComponent1)
+			g.HandleEntity(e1)
+
+			Convey("The entity should not be in the group's entities", func() {
+				So(g.Entities(), ShouldNotContain, e1)
+			})
+		})
+
+		Convey("When an matching entity component is removed", func() {
 			g.HandleEntity(e1)
 			e1.RemoveComponent(IndexComponent1)
 			g.HandleEntity(e1)
