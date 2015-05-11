@@ -61,7 +61,7 @@ func (e *entity) HasAnyComponent(types ...ComponentType) bool {
 
 func (e *entity) RemoveComponent(types ...ComponentType) {
 	for _, t := range types {
-		e.components[t] = nil
+		delete(e.components, t)
 	}
 }
 

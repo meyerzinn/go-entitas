@@ -51,6 +51,7 @@ func TestEntity(t *testing.T) {
 			e.AddComponent(c1)
 			e.RemoveComponent(c1.Type())
 			So(e.HasComponent(c1.Type()), ShouldBeFalse)
+			So(e.Components(), ShouldBeEmpty)
 		})
 
 		Convey("It gets a component of type", func() {
