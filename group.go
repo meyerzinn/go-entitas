@@ -2,7 +2,6 @@ package entitas
 
 type Group interface {
 	Entities() []Entity
-	Count() int
 	HandleEntity(entity Entity)
 	ContainsEntity(entity Entity) bool
 }
@@ -20,10 +19,6 @@ func NewGroup(matcher Matcher) Group {
 
 func (g *group) Entities() []Entity {
 	return g.entities
-}
-
-func (g *group) Count() int {
-	return 0
 }
 
 func (g *group) HandleEntity(entity Entity) {

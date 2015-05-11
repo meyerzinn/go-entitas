@@ -17,10 +17,6 @@ func TestGroup(t *testing.T) {
 			So(g.Entities(), ShouldBeEmpty)
 		})
 
-		Convey("It should be empty", func() {
-			So(g.Count(), ShouldEqual, 0)
-		})
-
 		Convey("It should not contain an entity", func() {
 			So(g.ContainsEntity(e1), ShouldBeFalse)
 		})
