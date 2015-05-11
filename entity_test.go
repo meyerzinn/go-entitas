@@ -13,43 +13,44 @@ func TestEntity(t *testing.T) {
 		e := NewEntity(0, IndexLength)
 		c1 := NewComponent1(1)
 		c2 := NewComponent2(2.0)
+		types := []ComponentType{c1.Type(), c2.Type()}
 
 		Convey("It has component of type when component of that type was added", func() {
 			e.AddComponent(c1)
-			So(e.HasComponent(c1), ShouldBeTrue)
+			So(e.HasComponent(c1.Type()), ShouldBeTrue)
 		})
 
 		Convey("It doesn't have component of type when no component of that type was added", func() {
-			So(e.HasComponent(c1), ShouldBeFalse)
+			So(e.HasComponent(c1.Type()), ShouldBeFalse)
 		})
 
 		Convey("It doesn't have components of types when no components of these types were added", func() {
-			So(e.HasComponent([]Component{c1}...), ShouldBeFalse)
+			So(e.HasComponent([]ComponentType{c1.Type()}...), ShouldBeFalse)
 		})
 
 		Convey("It doesn't have components of types when not all components of these types were added", func() {
 			e.AddComponent(c1)
-			So(e.HasComponent([]Component{c1, c2}...), ShouldBeFalse)
+			So(e.HasComponent(types...), ShouldBeFalse)
 		})
 
 		Convey("It has components of types when all components of these types were added", func() {
 			e.AddComponent(c1, c2)
-			So(e.HasComponent([]Component{c1, c2}...), ShouldBeTrue)
+			So(e.HasComponent(types...), ShouldBeTrue)
 		})
 
 		Convey("It doesn't have any components of types when no components of these types were added", func() {
-			So(e.HasAnyComponent([]Component{c1, c2}...), ShouldBeFalse)
+			So(e.HasAnyComponent(types...), ShouldBeFalse)
 		})
 
 		Convey("It has any components of types when any component of these types were added", func() {
 			e.AddComponent(c1)
-			So(e.HasAnyComponent([]Component{c1, c2}...), ShouldBeTrue)
+			So(e.HasAnyComponent(types...), ShouldBeTrue)
 		})
 
 		Convey("It removes a component of type", func() {
 			e.AddComponent(c1)
-			e.RemoveComponent(c1)
-			So(e.HasComponent(c1), ShouldBeFalse)
+			e.RemoveComponent(c1.Type())
+			So(e.HasComponent(c1.Type()), ShouldBeFalse)
 		})
 
 		Convey("It gets a component of type", func() {

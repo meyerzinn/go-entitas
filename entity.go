@@ -9,9 +9,9 @@ import (
 type Entity interface {
 	Index() int
 	AddComponent(component ...Component)
-	HasComponent(components ...Component) bool
-	HasAnyComponent(components ...Component) bool
-	RemoveComponent(components ...Component)
+	HasComponent(types ...ComponentType) bool
+	HasAnyComponent(types ...ComponentType) bool
+	RemoveComponent(types ...ComponentType)
 	Component(t ComponentType) (Component, error)
 	ReplaceComponent(components ...Component)
 	Components() []Component
@@ -41,27 +41,27 @@ func (e *entity) AddComponent(components ...Component) {
 	}
 }
 
-func (e *entity) HasComponent(components ...Component) bool {
-	for _, c := range components {
-		if e.components[c.Type()] == nil {
+func (e *entity) HasComponent(types ...ComponentType) bool {
+	for _, t := range types {
+		if e.components[t] == nil {
 			return false
 		}
 	}
 	return true
 }
 
-func (e *entity) HasAnyComponent(components ...Component) bool {
-	for _, c := range components {
-		if e.components[c.Type()] != nil {
+func (e *entity) HasAnyComponent(types ...ComponentType) bool {
+	for _, t := range types {
+		if e.components[t] != nil {
 			return true
 		}
 	}
 	return false
 }
 
-func (e *entity) RemoveComponent(components ...Component) {
-	for _, c := range components {
-		e.components[c.Type()] = nil
+func (e *entity) RemoveComponent(types ...ComponentType) {
+	for _, t := range types {
+		e.components[t] = nil
 	}
 }
 
