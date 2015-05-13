@@ -28,7 +28,9 @@ func (g *group) HandleEntity(entity Entity) {
 			g.entities = append(g.entities, entity)
 		}
 	} else {
-		g.removeEntity(i)
+		if !g.matcher.Matches(entity) {
+			g.removeEntity(i)
+		}
 	}
 }
 

@@ -35,6 +35,11 @@ func TestGroup(t *testing.T) {
 			Convey("It should contain the matching entity", func() {
 				So(g.ContainsEntity(e1), ShouldBeTrue)
 			})
+
+			Convey("It should still exist when added twice", func() {
+				g.HandleEntity(e1)
+				So(g.ContainsEntity(e1), ShouldBeTrue)
+			})
 		})
 
 		Convey("When non-matching entity is added", func() {
