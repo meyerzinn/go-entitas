@@ -1,5 +1,7 @@
 package entitas
 
+import "fmt"
+
 type Group interface {
 	Entities() []Entity
 	HandleEntity(entity Entity)
@@ -24,7 +26,9 @@ func (g *group) Entities() []Entity {
 func (g *group) HandleEntity(entity Entity) {
 	i := findEntity(g.entities, entity)
 	if i == -1 {
+		fmt.Println(entity)
 		if g.matcher.Matches(entity) {
+			fmt.Println("matches")
 			g.entities = append(g.entities, entity)
 		}
 	} else {

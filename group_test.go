@@ -8,7 +8,7 @@ import (
 
 func TestGroup(t *testing.T) {
 
-	Convey("Given a new group", t, func() {
+	Convey("Given a new group matching all of one component", t, func() {
 		g := NewGroup(AllOf([]ComponentType{IndexComponent1}))
 		e1 := NewEntity(0, IndexLength)
 		e1.AddComponent(NewComponent1(5))
@@ -63,4 +63,18 @@ func TestGroup(t *testing.T) {
 
 	})
 
+	Convey("Given a new group matching all of two component", t, func() {
+		g := NewGroup(AllOf([]ComponentType{IndexComponent1, IndexComponent2}))
+		e1 := NewEntity(0, IndexLength)
+		e1.AddComponent(NewComponent1(5))
+		e1.AddComponent(NewComponent2(5))
+
+		Convey("When entity is added", func() {
+			g.HandleEntity(e1)
+
+			Convey("The entity should be in the group's entities", func() {
+				So(g.Entities(), ShouldContain, e1)
+			})
+		})
+	})
 }
