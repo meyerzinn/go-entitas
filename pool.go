@@ -92,7 +92,16 @@ func (p *pool) DestroyAllEntities() {
 }
 
 func (p *pool) Group(matcher Matcher) Group {
-	return NewGroup(matcher)
+	g := NewGroup(matcher)
+	element := p.entities.Front()
+	for {
+		if element == nil {
+			break
+		}
+		g.HandleEntity(element.Value.(Entity))
+		element = element.Next()
+	}
+	return g
 }
 
 func (p *pool) String() string {

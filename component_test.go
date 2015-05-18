@@ -12,6 +12,7 @@ import (
 const (
 	IndexComponent1 ComponentType = iota
 	IndexComponent2
+	IndexComponent3
 	IndexLength
 )
 
@@ -49,6 +50,18 @@ func (c2 *component2) Type() ComponentType {
 
 func (c2 *component2) String() string {
 	return "Component2"
+}
+
+// Component 3
+
+type component3 struct{}
+
+func NewComponent3() Component {
+	return &component3{}
+}
+
+func (c *component3) Type() ComponentType {
+	return IndexComponent3
 }
 
 // Tests

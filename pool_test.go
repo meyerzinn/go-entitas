@@ -104,6 +104,14 @@ func TestPool(t *testing.T) {
 
 			})
 
+			Convey("When a group is created", func() {
+				g := p.Group(AllOf([]ComponentType{}))
+
+				Convey("The entity should be in the group", func() {
+					So(g.Entities(), ShouldContain, e1)
+				})
+			})
+
 		})
 
 	})

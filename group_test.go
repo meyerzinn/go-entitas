@@ -67,6 +67,7 @@ func TestGroup(t *testing.T) {
 		g := NewGroup(AllOf([]ComponentType{IndexComponent1, IndexComponent2}))
 		e1 := NewEntity(0, IndexLength)
 		e1.AddComponent(NewComponent1(5))
+		e1.AddComponent(NewComponent3())
 		e1.AddComponent(NewComponent2(5))
 
 		Convey("When entity is added", func() {
