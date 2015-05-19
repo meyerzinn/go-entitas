@@ -29,6 +29,29 @@ func TestEntity(t *testing.T) {
 			Convey("It returns an error when a component is already added", func() {
 				So(e.AddComponent(c1).Error(), ShouldEqual, "component exists")
 			})
+
+			Convey("It doesn't have components of other types", func() {
+				So(e.HasComponent(types...), ShouldBeFalse)
+			})
+
+			Convey("It has any components of types", func() {
+				So(e.HasAnyComponent(types...), ShouldBeTrue)
+			})
+
+			Convey("It removes a component of type", func() {
+				e.RemoveComponent(c1.Type())
+				So(e.HasComponent(c1.Type()), ShouldBeFalse)
+				So(e.Components(), ShouldBeEmpty)
+			})
+
+			Convey("It replaces an existing component", func() {
+				c11 := NewComponent1(2)
+				e.ReplaceComponent(c11)
+				actual, err := e.Component(c1.Type())
+				So(err, ShouldBeNil)
+				So(actual, ShouldNotEqual, c1)
+				So(actual, ShouldEqual, c11)
+			})
 		})
 
 		Convey("It doesn't have component of type when no component of that type was added", func() {
@@ -39,11 +62,6 @@ func TestEntity(t *testing.T) {
 			So(e.HasComponent([]ComponentType{c1.Type()}...), ShouldBeFalse)
 		})
 
-		Convey("It doesn't have components of types when not all components of these types were added", func() {
-			e.AddComponent(c1)
-			So(e.HasComponent(types...), ShouldBeFalse)
-		})
-
 		Convey("It has components of types when all components of these types were added", func() {
 			e.AddComponent(c1, c2)
 			So(e.HasComponent(types...), ShouldBeTrue)
@@ -51,18 +69,6 @@ func TestEntity(t *testing.T) {
 
 		Convey("It doesn't have any components of types when no components of these types were added", func() {
 			So(e.HasAnyComponent(types...), ShouldBeFalse)
-		})
-
-		Convey("It has any components of types when any component of these types were added", func() {
-			e.AddComponent(c1)
-			So(e.HasAnyComponent(types...), ShouldBeTrue)
-		})
-
-		Convey("It removes a component of type", func() {
-			e.AddComponent(c1)
-			e.RemoveComponent(c1.Type())
-			So(e.HasComponent(c1.Type()), ShouldBeFalse)
-			So(e.Components(), ShouldBeEmpty)
 		})
 
 		Convey("It gets a component of type", func() {
@@ -77,16 +83,6 @@ func TestEntity(t *testing.T) {
 			c, err := e.Component(c1.Type())
 			So(c, ShouldBeNil)
 			So(err.Error(), ShouldEqual, "component not found")
-		})
-
-		Convey("It replaces an existing component", func() {
-			e.AddComponent(c1)
-			c11 := NewComponent1(2)
-			e.ReplaceComponent(c11)
-			actual, err := e.Component(c1.Type())
-			So(err, ShouldBeNil)
-			So(actual, ShouldNotEqual, c1)
-			So(actual, ShouldEqual, c11)
 		})
 
 		Convey("It adds a component when replacing a non existing component", func() {
