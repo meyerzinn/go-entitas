@@ -50,8 +50,8 @@ func TestPool(t *testing.T) {
 				So(p.Count(), ShouldEqual, 1)
 			})
 
-			Convey("It increments creationIndex", func() {
-				So(e1.Index(), ShouldEqual, 0)
+			Convey("It increments ID", func() {
+				So(e1.ID(), ShouldEqual, 0)
 			})
 
 			Convey("It destroys entity and removes it", func() {
@@ -68,8 +68,8 @@ func TestPool(t *testing.T) {
 					So(p.Count(), ShouldEqual, 2)
 				})
 
-				Convey("It increments creationIndex", func() {
-					So(e2.Index(), ShouldEqual, 1)
+				Convey("It increments ID", func() {
+					So(e2.ID(), ShouldEqual, 1)
 				})
 
 				Convey("It should have the entity", func() {
@@ -118,13 +118,13 @@ func TestPool(t *testing.T) {
 
 }
 
-func TestPoolCreationIndex(t *testing.T) {
-	Convey("Given a new pool with a different index", t, func() {
+func TestPoolEntityID(t *testing.T) {
+	Convey("Given a new pool with a different ID", t, func() {
 		op := NewPool(IndexLength, 7)
 
-		Convey("It creates new entities with that index", func() {
+		Convey("It creates new entities with that ID", func() {
 			e := op.CreateEntity()
-			So(e.Index(), ShouldEqual, 7)
+			So(e.ID(), ShouldEqual, 7)
 		})
 	})
 }

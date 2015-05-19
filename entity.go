@@ -7,7 +7,7 @@ import (
 )
 
 type Entity interface {
-	Index() int
+	ID() int
 	AddComponent(component ...Component)
 	HasComponent(types ...ComponentType) bool
 	HasAnyComponent(types ...ComponentType) bool
@@ -20,19 +20,19 @@ type Entity interface {
 }
 
 type entity struct {
-	index      int
+	id         int
 	components map[ComponentType]Component
 }
 
-func NewEntity(index int) Entity {
+func NewEntity(id int) Entity {
 	return &entity{
-		index:      index,
+		id:         id,
 		components: make(map[ComponentType]Component),
 	}
 }
 
-func (e *entity) Index() int {
-	return e.index
+func (e *entity) ID() int {
+	return e.id
 }
 
 func (e *entity) AddComponent(components ...Component) {
@@ -105,5 +105,5 @@ func (e *entity) RemoveAllComponents() {
 }
 
 func (e *entity) String() string {
-	return fmt.Sprintf("Entity_%d(%v)", e.index, e.Components())
+	return fmt.Sprintf("Entity_%d(%v)", e.id, e.Components())
 }

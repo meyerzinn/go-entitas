@@ -15,6 +15,10 @@ func TestEntity(t *testing.T) {
 		c2 := NewComponent2(2.0)
 		types := []ComponentType{c1.Type(), c2.Type()}
 
+		Convey("It has the correct ID", func() {
+			So(e.ID(), ShouldEqual, 0)
+		})
+
 		Convey("It has component of type when component of that type was added", func() {
 			e.AddComponent(c1)
 			So(e.HasComponent(c1.Type()), ShouldBeTrue)
