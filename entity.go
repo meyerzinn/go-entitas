@@ -6,8 +6,10 @@ import (
 	"sort"
 )
 
+type EntityID uint
+
 type Entity interface {
-	ID() int
+	ID() EntityID
 	AddComponent(component ...Component)
 	HasComponent(types ...ComponentType) bool
 	HasAnyComponent(types ...ComponentType) bool
@@ -20,18 +22,18 @@ type Entity interface {
 }
 
 type entity struct {
-	id         int
+	id         EntityID
 	components map[ComponentType]Component
 }
 
 func NewEntity(id int) Entity {
 	return &entity{
-		id:         id,
+		id:         EntityID(id),
 		components: make(map[ComponentType]Component),
 	}
 }
 
-func (e *entity) ID() int {
+func (e *entity) ID() EntityID {
 	return e.id
 }
 
