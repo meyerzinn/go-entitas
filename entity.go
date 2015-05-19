@@ -45,7 +45,7 @@ func (e *entity) AddComponent(components ...Component) {
 
 func (e *entity) HasComponent(types ...ComponentType) bool {
 	for _, t := range types {
-		if e.components[t] == nil {
+		if _, ok := e.components[t]; !ok {
 			return false
 		}
 	}
@@ -54,7 +54,7 @@ func (e *entity) HasComponent(types ...ComponentType) bool {
 
 func (e *entity) HasAnyComponent(types ...ComponentType) bool {
 	for _, t := range types {
-		if e.components[t] != nil {
+		if _, ok := e.components[t]; ok {
 			return true
 		}
 	}
