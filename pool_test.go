@@ -17,7 +17,7 @@ func TestPool(t *testing.T) {
 		})
 
 		Convey("It creates entity", func() {
-			So(p.CreateEntity(), ShouldHaveSameTypeAs, NewEntity(-1, IndexLength))
+			So(p.CreateEntity(), ShouldHaveSameTypeAs, NewEntity(-1))
 		})
 
 		Convey("It has a total entity count of 0", func() {
@@ -25,7 +25,7 @@ func TestPool(t *testing.T) {
 		})
 
 		Convey("It doesn't have entities that were not created with CreateEntity()", func() {
-			So(p.HasEntity(NewEntity(-1, IndexLength)), ShouldBeFalse)
+			So(p.HasEntity(NewEntity(-1)), ShouldBeFalse)
 		})
 
 		Convey("It gets empty group for matcher when no entities were created", func() {
@@ -34,7 +34,7 @@ func TestPool(t *testing.T) {
 		})
 
 		Convey("It should panic when trying to destroy an entity which doesn't exist", func() {
-			e := NewEntity(-1, 0)
+			e := NewEntity(-1)
 			So(func() { p.DestroyEntity(e) }, ShouldPanicWith, "tried to remove element not in list")
 		})
 

@@ -10,7 +10,7 @@ import (
 func TestEntity(t *testing.T) {
 
 	Convey("When given a new entity", t, func() {
-		e := NewEntity(0, IndexLength)
+		e := NewEntity(0)
 		c1 := NewComponent1(1)
 		c2 := NewComponent2(2.0)
 		types := []ComponentType{c1.Type(), c2.Type()}

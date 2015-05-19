@@ -10,7 +10,7 @@ func TestGroup(t *testing.T) {
 
 	Convey("Given a new group matching all of one component", t, func() {
 		g := NewGroup(AllOf([]ComponentType{IndexComponent1}))
-		e1 := NewEntity(0, IndexLength)
+		e1 := NewEntity(0)
 		e1.AddComponent(NewComponent1(5))
 
 		Convey("It gets empty group for matcher when no entities were created", func() {
@@ -65,7 +65,7 @@ func TestGroup(t *testing.T) {
 
 	Convey("Given a new group matching all of two component", t, func() {
 		g := NewGroup(AllOf([]ComponentType{IndexComponent1, IndexComponent2}))
-		e1 := NewEntity(0, IndexLength)
+		e1 := NewEntity(0)
 		e1.AddComponent(NewComponent1(5))
 		e1.AddComponent(NewComponent3())
 		e1.AddComponent(NewComponent2(5))

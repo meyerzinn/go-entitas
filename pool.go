@@ -30,7 +30,7 @@ func NewPool(componentsLength ComponentType, index int) Pool {
 }
 
 func (p *pool) CreateEntity(components ...Component) Entity {
-	e := NewEntity(p.index, p.componentsLength)
+	e := NewEntity(p.index)
 	for _, c := range components {
 		e.AddComponent(c)
 	}

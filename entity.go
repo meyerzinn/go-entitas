@@ -24,7 +24,7 @@ type entity struct {
 	components map[ComponentType]Component
 }
 
-func NewEntity(index int, componentsLength ComponentType) Entity {
+func NewEntity(index int) Entity {
 	return &entity{
 		index:      index,
 		components: make(map[ComponentType]Component),
