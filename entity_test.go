@@ -19,9 +19,16 @@ func TestEntity(t *testing.T) {
 			So(e.ID(), ShouldEqual, 0)
 		})
 
-		Convey("It has component of type when component of that type was added", func() {
+		Convey("When component of that type was added", func() {
 			e.AddComponent(c1)
-			So(e.HasComponent(c1.Type()), ShouldBeTrue)
+
+			Convey("It has component of type", func() {
+				So(e.HasComponent(c1.Type()), ShouldBeTrue)
+			})
+
+			Convey("It returns an error when a component is already added", func() {
+				So(e.AddComponent(c1).Error(), ShouldEqual, "component exists")
+			})
 		})
 
 		Convey("It doesn't have component of type when no component of that type was added", func() {

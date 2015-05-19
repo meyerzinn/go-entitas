@@ -6,11 +6,15 @@ import (
 	"sort"
 )
 
+var (
+	ErrComponentExists = errors.New("component exists")
+)
+
 type EntityID uint
 
 type Entity interface {
 	ID() EntityID
-	AddComponent(component ...Component)
+	AddComponent(component ...Component) error
 	HasComponent(types ...ComponentType) bool
 	HasAnyComponent(types ...ComponentType) bool
 	RemoveComponent(types ...ComponentType)
@@ -37,10 +41,14 @@ func (e *entity) ID() EntityID {
 	return e.id
 }
 
-func (e *entity) AddComponent(components ...Component) {
+func (e *entity) AddComponent(components ...Component) error {
 	for _, c := range components {
+		if e.HasComponent(c.Type()) {
+			return ErrComponentExists
+		}
 		e.components[c.Type()] = c
 	}
+	return nil
 }
 
 func (e *entity) HasComponent(types ...ComponentType) bool {
