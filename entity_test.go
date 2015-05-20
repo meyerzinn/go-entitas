@@ -82,7 +82,7 @@ func TestEntity(t *testing.T) {
 		Convey("It doesn't get a component of type that wasn't added", func() {
 			c, err := e.Component(c1.Type())
 			So(c, ShouldBeNil)
-			So(err.Error(), ShouldEqual, "component not found")
+			So(err.Error(), ShouldEqual, "component does not exist")
 		})
 
 		Convey("It adds a component when replacing a non existing component", func() {
@@ -117,10 +117,10 @@ func TestEntity(t *testing.T) {
 			e.RemoveAllComponents()
 			actual, err := e.Component(c1.Type())
 			So(actual, ShouldBeNil)
-			So(err.Error(), ShouldEqual, "component not found")
+			So(err.Error(), ShouldEqual, "component does not exist")
 			actual, err = e.Component(c2.Type())
 			So(actual, ShouldBeNil)
-			So(err.Error(), ShouldEqual, "component not found")
+			So(err.Error(), ShouldEqual, "component does not exist")
 		})
 
 		Convey("It can be printed", func() {

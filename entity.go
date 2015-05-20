@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	ErrComponentExists = errors.New("component exists")
+	ErrComponentExists       = errors.New("component exists")
+	ErrComponentDoesNotExist = errors.New("component does not exist")
 )
 
 type EntityID uint
@@ -78,7 +79,7 @@ func (e *entity) RemoveComponent(ts ...ComponentType) {
 func (e *entity) Component(t ComponentType) (Component, error) {
 	c := e.components[t]
 	if c == nil {
-		return nil, errors.New("component not found")
+		return nil, ErrComponentDoesNotExist
 	}
 	return c, nil
 }
