@@ -2,8 +2,8 @@ package entitas
 
 type Group interface {
 	Entities() []Entity
-	HandleEntity(entity Entity)
-	ContainsEntity(entity Entity) bool
+	HandleEntity(e Entity)
+	ContainsEntity(e Entity) bool
 }
 
 type group struct {
@@ -21,29 +21,29 @@ func (g *group) Entities() []Entity {
 	return g.entities
 }
 
-func (g *group) HandleEntity(entity Entity) {
-	i := findEntity(g.entities, entity)
+func (g *group) HandleEntity(e Entity) {
+	i := findEntity(g.entities, e)
 	if i == -1 {
-		if g.matcher.Matches(entity) {
-			g.entities = append(g.entities, entity)
+		if g.matcher.Matches(e) {
+			g.entities = append(g.entities, e)
 		}
 	} else {
-		if !g.matcher.Matches(entity) {
+		if !g.matcher.Matches(e) {
 			g.removeEntity(i)
 		}
 	}
 }
 
-func (g *group) ContainsEntity(entity Entity) bool {
-	if findEntity(g.entities, entity) == -1 {
+func (g *group) ContainsEntity(e Entity) bool {
+	if findEntity(g.entities, e) == -1 {
 		return false
 	}
 	return true
 }
 
-func findEntity(entities []Entity, entity Entity) int {
-	for i, e := range entities {
-		if e == entity {
+func findEntity(entities []Entity, e Entity) int {
+	for i, entity := range entities {
+		if entity == e {
 			return i
 		}
 	}

@@ -9,10 +9,10 @@ type Pool interface {
 	CreateEntity(components ...Component) Entity
 	Entities() []Entity
 	Count() int
-	HasEntity(entity Entity) bool
-	DestroyEntity(entity Entity)
+	HasEntity(e Entity) bool
+	DestroyEntity(e Entity)
 	DestroyAllEntities()
-	Group(matcher Matcher) Group
+	Group(m Matcher) Group
 }
 
 type pool struct {
@@ -54,28 +54,28 @@ func (p *pool) Count() int {
 	return len(p.Entities())
 }
 
-func (p *pool) HasEntity(entity Entity) bool {
+func (p *pool) HasEntity(e Entity) bool {
 	element := p.entities.Front()
 	for {
 		if element == nil {
 			return false
 		}
-		if element.Value == entity {
+		if element.Value == e {
 			return true
 		}
 		element = element.Next()
 	}
 }
 
-func (p *pool) DestroyEntity(entity Entity) {
+func (p *pool) DestroyEntity(e Entity) {
 	element := p.entities.Front()
 	for {
 		if element == nil {
 			panic("tried to remove element not in list")
 		}
-		if element.Value == entity {
+		if element.Value == e {
 			p.entities.Remove(element)
-			entity.RemoveAllComponents()
+			e.RemoveAllComponents()
 			return
 		}
 		element = element.Next()
@@ -91,8 +91,8 @@ func (p *pool) DestroyAllEntities() {
 	p.entities = p.entities.Init()
 }
 
-func (p *pool) Group(matcher Matcher) Group {
-	g := NewGroup(matcher)
+func (p *pool) Group(m Matcher) Group {
+	g := NewGroup(m)
 	element := p.entities.Front()
 	for {
 		if element == nil {

@@ -14,12 +14,12 @@ type EntityID uint
 
 type Entity interface {
 	ID() EntityID
-	AddComponent(component ...Component) error
-	HasComponent(types ...ComponentType) bool
-	HasAnyComponent(types ...ComponentType) bool
-	RemoveComponent(types ...ComponentType)
+	AddComponent(cs ...Component) error
+	HasComponent(ts ...ComponentType) bool
+	HasAnyComponent(ts ...ComponentType) bool
+	RemoveComponent(ts ...ComponentType)
 	Component(t ComponentType) (Component, error)
-	ReplaceComponent(components ...Component)
+	ReplaceComponent(cs ...Component)
 	Components() []Component
 	ComponentIndices() []ComponentType
 	RemoveAllComponents()
@@ -41,8 +41,8 @@ func (e *entity) ID() EntityID {
 	return e.id
 }
 
-func (e *entity) AddComponent(components ...Component) error {
-	for _, c := range components {
+func (e *entity) AddComponent(cs ...Component) error {
+	for _, c := range cs {
 		if e.HasComponent(c.Type()) {
 			return ErrComponentExists
 		}
@@ -51,8 +51,8 @@ func (e *entity) AddComponent(components ...Component) error {
 	return nil
 }
 
-func (e *entity) HasComponent(types ...ComponentType) bool {
-	for _, t := range types {
+func (e *entity) HasComponent(ts ...ComponentType) bool {
+	for _, t := range ts {
 		if _, ok := e.components[t]; !ok {
 			return false
 		}
@@ -60,8 +60,8 @@ func (e *entity) HasComponent(types ...ComponentType) bool {
 	return true
 }
 
-func (e *entity) HasAnyComponent(types ...ComponentType) bool {
-	for _, t := range types {
+func (e *entity) HasAnyComponent(ts ...ComponentType) bool {
+	for _, t := range ts {
 		if _, ok := e.components[t]; ok {
 			return true
 		}
@@ -69,8 +69,8 @@ func (e *entity) HasAnyComponent(types ...ComponentType) bool {
 	return false
 }
 
-func (e *entity) RemoveComponent(types ...ComponentType) {
-	for _, t := range types {
+func (e *entity) RemoveComponent(ts ...ComponentType) {
+	for _, t := range ts {
 		delete(e.components, t)
 	}
 }
@@ -83,8 +83,8 @@ func (e *entity) Component(t ComponentType) (Component, error) {
 	return c, nil
 }
 
-func (e *entity) ReplaceComponent(components ...Component) {
-	for _, c := range components {
+func (e *entity) ReplaceComponent(cs ...Component) {
+	for _, c := range cs {
 		e.components[c.Type()] = c
 	}
 }
