@@ -83,7 +83,9 @@ func TestPool(t *testing.T) {
 				})
 
 				Convey("It can be printed", func() {
-					So(fmt.Sprintf("%v", p), ShouldEqual, "Pool([Entity_0([Component1]) Entity_1([])])")
+					So(fmt.Sprintf("%v", p), ShouldContainSubstring, "Pool(")
+					So(fmt.Sprintf("%v", p), ShouldContainSubstring, "Entity_0([Component1])")
+					So(fmt.Sprintf("%v", p), ShouldContainSubstring, "Entity_1([])")
 				})
 
 				Convey("It should remove that entity when destroyed", func() {
