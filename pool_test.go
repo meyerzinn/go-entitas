@@ -35,7 +35,7 @@ func TestPool(t *testing.T) {
 
 		Convey("It should panic when trying to destroy an entity which doesn't exist", func() {
 			e := NewEntity(-1)
-			So(func() { p.DestroyEntity(e) }, ShouldPanicWith, "tried to remove element not in list")
+			So(func() { p.DestroyEntity(e) }, ShouldPanicWith, "unknown entity")
 		})
 
 		Convey("When an entity is created", func() {

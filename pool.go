@@ -1,12 +1,9 @@
 package entitas
 
-import (
-	"container/list"
-	"fmt"
-)
+import "fmt"
 
 type Pool interface {
-	CreateEntity(components ...Component) Entity
+	CreateEntity(cs ...Component) Entity
 	Entities() []Entity
 	Count() int
 	HasEntity(e Entity) bool
@@ -18,88 +15,64 @@ type Pool interface {
 type pool struct {
 	index            int
 	componentsLength ComponentType
-	entities         *list.List
+	entities         map[EntityID]Entity
 }
 
 func NewPool(componentsLength ComponentType, index int) Pool {
 	return &pool{
 		index:            index,
-		entities:         list.New(),
 		componentsLength: componentsLength,
+		entities:         make(map[EntityID]Entity),
 	}
 }
 
-func (p *pool) CreateEntity(components ...Component) Entity {
+func (p *pool) CreateEntity(cs ...Component) Entity {
 	e := NewEntity(p.index)
-	for _, c := range components {
-		e.AddComponent(c)
-	}
-	p.entities.PushBack(e)
+	e.AddComponent(cs...)
+	p.entities[e.ID()] = e
 	p.index++
 	return e
 }
 
 func (p *pool) Entities() []Entity {
-	element := p.entities.Front()
-	length := p.entities.Len()
-	elements := make([]Entity, length)
-	for i := 0; i < length; i++ {
-		elements[i] = element.Value.(Entity)
-		element = element.Next()
+	entities := make([]Entity, 0, len(p.entities))
+	for _, e := range p.entities {
+		entities = append(entities, e)
 	}
-	return elements
+	return entities
 }
 
 func (p *pool) Count() int {
-	return len(p.Entities())
+	return len(p.entities)
 }
 
 func (p *pool) HasEntity(e Entity) bool {
-	element := p.entities.Front()
-	for {
-		if element == nil {
-			return false
-		}
-		if element.Value == e {
-			return true
-		}
-		element = element.Next()
+	if entity, ok := p.entities[e.ID()]; ok && entity == e {
+		return true
 	}
+	return false
 }
 
 func (p *pool) DestroyEntity(e Entity) {
-	element := p.entities.Front()
-	for {
-		if element == nil {
-			panic("tried to remove element not in list")
-		}
-		if element.Value == e {
-			p.entities.Remove(element)
-			e.RemoveAllComponents()
-			return
-		}
-		element = element.Next()
+	if entity, ok := p.entities[e.ID()]; ok && entity == e {
+		e.RemoveAllComponents()
+		delete(p.entities, e.ID())
+		return
 	}
+	panic("unknown entity")
 }
 
 func (p *pool) DestroyAllEntities() {
-	element := p.entities.Front()
-	for element != nil {
-		element.Value.(Entity).RemoveAllComponents()
-		element = element.Next()
+	for _, e := range p.entities {
+		e.RemoveAllComponents()
 	}
-	p.entities = p.entities.Init()
+	p.entities = make(map[EntityID]Entity)
 }
 
 func (p *pool) Group(m Matcher) Group {
 	g := NewGroup(m)
-	element := p.entities.Front()
-	for {
-		if element == nil {
-			break
-		}
-		g.HandleEntity(element.Value.(Entity))
-		element = element.Next()
+	for _, e := range p.entities {
+		g.HandleEntity(e)
 	}
 	return g
 }
