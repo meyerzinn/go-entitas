@@ -9,7 +9,7 @@ import (
 func TestGroup(t *testing.T) {
 
 	Convey("Given a new group matching all of one component", t, func() {
-		g := NewGroup(AllOf([]ComponentType{IndexComponent1}))
+		g := NewGroup(AllOf(IndexComponent1))
 		e1 := NewEntity(0)
 		e1.AddComponent(NewComponent1(5))
 
@@ -64,7 +64,7 @@ func TestGroup(t *testing.T) {
 	})
 
 	Convey("Given a new group matching all of two component", t, func() {
-		g := NewGroup(AllOf([]ComponentType{IndexComponent1, IndexComponent2}))
+		g := NewGroup(AllOf(IndexComponent1, IndexComponent2))
 		e1 := NewEntity(0)
 		e1.AddComponent(NewComponent1(5))
 		e1.AddComponent(NewComponent3())

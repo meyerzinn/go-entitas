@@ -29,7 +29,7 @@ func TestPool(t *testing.T) {
 		})
 
 		Convey("It gets empty group for matcher when no entities were created", func() {
-			g := p.Group(AllOf([]ComponentType{IndexComponent1}))
+			g := p.Group(AllOf(IndexComponent1))
 			So(g.Entities(), ShouldBeEmpty)
 		})
 
@@ -107,7 +107,7 @@ func TestPool(t *testing.T) {
 			})
 
 			Convey("When a group is created", func() {
-				g := p.Group(AllOf([]ComponentType{}))
+				g := p.Group(AllOf())
 
 				Convey("The entity should be in the group", func() {
 					So(g.Entities(), ShouldContain, e1)
@@ -129,4 +129,21 @@ func TestPoolEntityID(t *testing.T) {
 			So(e.ID(), ShouldEqual, 7)
 		})
 	})
+}
+
+func BenchmarkCreateGroup(b *testing.B) {
+	p := NewPool(IndexLength, 0)
+
+	for i := 0; i < 2000; i++ {
+		p.CreateEntity(
+			NewComponent1(i),
+			NewComponent2(float32(i)),
+			NewComponent3(),
+		)
+	}
+
+	for n := 0; n < b.N; n++ {
+		g := p.Group(AllOf(IndexComponent1))
+		g.Entities()
+	}
 }

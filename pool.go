@@ -16,6 +16,7 @@ type pool struct {
 	index            int
 	componentsLength ComponentType
 	entities         map[EntityID]Entity
+	groups           map[MatcherHash]Group
 }
 
 func NewPool(componentsLength ComponentType, index int) Pool {
@@ -23,6 +24,7 @@ func NewPool(componentsLength ComponentType, index int) Pool {
 		index:            index,
 		componentsLength: componentsLength,
 		entities:         make(map[EntityID]Entity),
+		groups:           make(map[MatcherHash]Group),
 	}
 }
 
@@ -31,6 +33,9 @@ func (p *pool) CreateEntity(cs ...Component) Entity {
 	e.AddComponent(cs...)
 	p.entities[e.ID()] = e
 	p.index++
+	for _, g := range p.groups {
+		g.HandleEntity(e)
+	}
 	return e
 }
 
@@ -57,6 +62,9 @@ func (p *pool) DestroyEntity(e Entity) {
 	if entity, ok := p.entities[e.ID()]; ok && entity == e {
 		e.RemoveAllComponents()
 		delete(p.entities, e.ID())
+		for _, g := range p.groups {
+			g.HandleEntity(e)
+		}
 		return
 	}
 	panic("unknown entity")
@@ -70,10 +78,15 @@ func (p *pool) DestroyAllEntities() {
 }
 
 func (p *pool) Group(m Matcher) Group {
+	if g, ok := p.groups[m.Hash()]; ok {
+		return g
+	}
+
 	g := NewGroup(m)
 	for _, e := range p.entities {
 		g.HandleEntity(e)
 	}
+	p.groups[m.Hash()] = g
 	return g
 }
 

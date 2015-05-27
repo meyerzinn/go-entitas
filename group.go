@@ -7,41 +7,51 @@ type Group interface {
 }
 
 type group struct {
-	entities []Entity
+	entities map[EntityID]Entity
+	cache    []Entity
 	matcher  Matcher
 }
 
 func NewGroup(matcher Matcher) Group {
 	return &group{
-		matcher: matcher,
+		entities: make(map[EntityID]Entity),
+		cache:    make([]Entity, 0),
+		matcher:  matcher,
 	}
 }
 
 func (g *group) Entities() []Entity {
-	return g.entities
+	return g.cache
 }
 
 func (g *group) HandleEntity(e Entity) {
-	i := findEntity(g.entities, e)
-	if i == -1 {
-		if g.matcher.Matches(e) {
-			g.entities = append(g.entities, e)
-		}
+	if g.matcher.Matches(e) {
+		g.addEntity(e)
 	} else {
-		if !g.matcher.Matches(e) {
-			g.removeEntity(i)
-		}
+		g.removeEntity(e)
+	}
+}
+
+func (g *group) addEntity(e Entity) {
+	g.entities[e.ID()] = e
+	g.cache = append(g.cache, e)
+}
+
+func (g *group) removeEntity(e Entity) {
+	delete(g.entities, e.ID())
+	if i := findIndex(g.cache, e); i != -1 {
+		g.cache = removeIndexed(g.cache, i)
 	}
 }
 
 func (g *group) ContainsEntity(e Entity) bool {
-	if findEntity(g.entities, e) == -1 {
-		return false
+	if _, ok := g.entities[e.ID()]; ok {
+		return true
 	}
-	return true
+	return false
 }
 
-func findEntity(entities []Entity, e Entity) int {
+func findIndex(entities []Entity, e Entity) int {
 	for i, entity := range entities {
 		if entity == e {
 			return i
@@ -50,8 +60,8 @@ func findEntity(entities []Entity, e Entity) int {
 	return -1
 }
 
-func (g *group) removeEntity(i int) {
-	copy(g.entities[i:], g.entities[i+1:])
-	g.entities[len(g.entities)-1] = nil
-	g.entities = g.entities[:len(g.entities)-1]
+func removeIndexed(entities []Entity, i int) []Entity {
+	copy(entities[i:], entities[i+1:])
+	entities[len(entities)-1] = nil
+	return entities[:len(entities)-1]
 }
