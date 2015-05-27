@@ -131,7 +131,7 @@ func TestPoolEntityID(t *testing.T) {
 	})
 }
 
-func BenchmarkCreateGroup(b *testing.B) {
+func BenchmarkPoolCreateGroup(b *testing.B) {
 	p := NewPool(IndexLength, 0)
 
 	for i := 0; i < 2000; i++ {

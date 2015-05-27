@@ -128,6 +128,111 @@ func TestEntity(t *testing.T) {
 			So(fmt.Sprintf("%v", e), ShouldEqual, "Entity_0([Component1 Component2])")
 		})
 
+		Convey("When it has callbacks", func() {
+			added := false
+			var added_e Entity
+			var added_c Component
+			replaced := false
+			var replaced_e Entity
+			var replaced_c Component
+			removed := false
+			var removed_e Entity
+			var removed_c Component
+			c := NewComponent1(0)
+			e.AddCallback(ComponentAdded, func(e Entity, c Component) {
+				added = true
+				added_e = e
+				added_c = c
+			})
+			e.AddCallback(ComponentReplaced, func(e Entity, c Component) {
+				replaced = true
+				replaced_e = e
+				replaced_c = c
+			})
+			e.AddCallback(ComponentRemoved, func(e Entity, c Component) {
+				removed = true
+				removed_e = e
+				removed_c = c
+			})
+			Convey("When a component is added", func() {
+				e.AddComponent(c)
+
+				Convey("It should be called when added", func() {
+					So(added, ShouldBeTrue)
+					So(added_e, ShouldEqual, e)
+					So(added_c, ShouldEqual, c)
+				})
+
+				Convey("It should be called when replaced", func() {
+					e.ReplaceComponent(c)
+					So(replaced, ShouldBeTrue)
+					So(replaced_e, ShouldEqual, e)
+					So(replaced_c, ShouldEqual, c)
+				})
+
+				Convey("It should be called when removed", func() {
+					e.RemoveComponent(c.Type())
+					So(removed, ShouldBeTrue)
+					So(removed_e, ShouldEqual, e)
+					So(removed_c, ShouldEqual, c)
+				})
+			})
+
+		})
+
 	})
 
+}
+
+func BenchmarkEntityAddComponents(b *testing.B) {
+	c1 := NewComponent1(1)
+	c2 := NewComponent2(1.0)
+	c3 := NewComponent3()
+	e := NewEntity(0)
+	for n := 0; n < b.N; n++ {
+		e.AddComponent(c1, c2, c3)
+	}
+}
+
+func BenchmarkEntityReplaceNew(b *testing.B) {
+	c1 := NewComponent1(1)
+	c2 := NewComponent2(1.0)
+	c3 := NewComponent3()
+	e := NewEntity(0)
+	for n := 0; n < b.N; n++ {
+		e.ReplaceComponent(c1, c2, c3)
+	}
+}
+
+func BenchmarkEntityReplaceOld(b *testing.B) {
+	c1 := NewComponent1(1)
+	c2 := NewComponent2(1.0)
+	c3 := NewComponent3()
+	e := NewEntity(0)
+	e.AddComponent(c1, c2, c3)
+	for n := 0; n < b.N; n++ {
+		e.ReplaceComponent(c1, c2, c3)
+	}
+}
+
+func BenchmarkEntityRemoveComponents(b *testing.B) {
+	c1 := NewComponent1(1)
+	c2 := NewComponent2(1.0)
+	c3 := NewComponent3()
+	e := NewEntity(0)
+	e.AddComponent(c1, c2, c3)
+	for n := 0; n < b.N; n++ {
+		e.RemoveComponent(IndexComponent1, IndexComponent2, IndexComponent3)
+	}
+}
+
+func BenchmarkEntityRemoveAll(b *testing.B) {
+	c1 := NewComponent1(1)
+	c2 := NewComponent2(1.0)
+	c3 := NewComponent3()
+	e := NewEntity(0)
+	e.AddComponent(c1, c2, c3)
+	for n := 0; n < b.N; n++ {
+		e.RemoveAllComponents()
+	}
 }

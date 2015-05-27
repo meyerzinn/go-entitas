@@ -33,6 +33,9 @@ func (p *pool) CreateEntity(cs ...Component) Entity {
 	e.AddComponent(cs...)
 	p.entities[e.ID()] = e
 	p.index++
+	e.AddCallback(ComponentAdded, p.componentAddedCallback)
+	e.AddCallback(ComponentReplaced, p.componentReplacedCallback)
+	e.AddCallback(ComponentRemoved, p.componentRemovedCallback)
 	for _, g := range p.groups {
 		g.HandleEntity(e)
 	}
@@ -92,4 +95,18 @@ func (p *pool) Group(m Matcher) Group {
 
 func (p *pool) String() string {
 	return fmt.Sprintf("Pool(%v)", p.Entities())
+}
+
+func (p *pool) componentAddedCallback(e Entity, c Component) {
+	for _, g := range p.groups {
+		g.HandleEntity(e)
+	}
+}
+
+func (p *pool) componentReplacedCallback(e Entity, c Component) {}
+
+func (p *pool) componentRemovedCallback(e Entity, c Component) {
+	for _, g := range p.groups {
+		g.HandleEntity(e)
+	}
 }

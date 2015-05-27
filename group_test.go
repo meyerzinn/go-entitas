@@ -79,3 +79,20 @@ func TestGroup(t *testing.T) {
 		})
 	})
 }
+
+func BenchmarkGroupHandleEntity(b *testing.B) {
+	c1 := NewComponent1(1)
+	c2 := NewComponent2(1.0)
+	g := NewGroup(AllOf(IndexComponent1, IndexComponent2))
+
+	e := &entity{
+		id:         0,
+		components: make(map[ComponentType]Component),
+		callbacks:  make(map[ComponentEvent][]ComponentCallback),
+	}
+	Entity(e).AddComponent(c1, c2)
+	for n := 0; n < b.N; n++ {
+		e.id = EntityID(n % 100) // Add and remove 100 different entities
+		g.HandleEntity(e)
+	}
+}
