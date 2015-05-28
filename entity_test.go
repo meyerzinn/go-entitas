@@ -11,8 +11,8 @@ func TestEntity(t *testing.T) {
 
 	Convey("When given a new entity", t, func() {
 		e := NewEntity(0)
-		c1 := NewComponent1(1)
-		c2 := NewComponent2(2.0)
+		c1 := NewComponentA(1)
+		c2 := NewComponentB(2.0)
 		types := []ComponentType{c1.Type(), c2.Type()}
 
 		Convey("It has the correct ID", func() {
@@ -45,7 +45,7 @@ func TestEntity(t *testing.T) {
 			})
 
 			Convey("It replaces an existing component", func() {
-				c11 := NewComponent1(2)
+				c11 := NewComponentA(2)
 				e.ReplaceComponent(c11)
 				actual, err := e.Component(c1.Type())
 				So(err, ShouldBeNil)
@@ -125,7 +125,7 @@ func TestEntity(t *testing.T) {
 
 		Convey("It can be printed", func() {
 			e.AddComponent(c1, c2)
-			So(fmt.Sprintf("%v", e), ShouldEqual, "Entity_0([Component1 Component2])")
+			So(fmt.Sprintf("%v", e), ShouldEqual, "Entity_0([A B])")
 		})
 
 		Convey("When it has callbacks", func() {
@@ -138,7 +138,7 @@ func TestEntity(t *testing.T) {
 			removed := false
 			var removed_e Entity
 			var removed_c Component
-			c := NewComponent1(0)
+			c := NewComponentA(0)
 			e.AddCallback(ComponentAdded, func(e Entity, c Component) {
 				added = true
 				added_e = e
@@ -185,9 +185,9 @@ func TestEntity(t *testing.T) {
 }
 
 func BenchmarkEntityAddComponents(b *testing.B) {
-	c1 := NewComponent1(1)
-	c2 := NewComponent2(1.0)
-	c3 := NewComponent3()
+	c1 := NewComponentA(1)
+	c2 := NewComponentB(1.0)
+	c3 := NewComponentC()
 	e := NewEntity(0)
 	for n := 0; n < b.N; n++ {
 		e.AddComponent(c1, c2, c3)
@@ -195,9 +195,9 @@ func BenchmarkEntityAddComponents(b *testing.B) {
 }
 
 func BenchmarkEntityReplaceNew(b *testing.B) {
-	c1 := NewComponent1(1)
-	c2 := NewComponent2(1.0)
-	c3 := NewComponent3()
+	c1 := NewComponentA(1)
+	c2 := NewComponentB(1.0)
+	c3 := NewComponentC()
 	e := NewEntity(0)
 	for n := 0; n < b.N; n++ {
 		e.ReplaceComponent(c1, c2, c3)
@@ -205,9 +205,9 @@ func BenchmarkEntityReplaceNew(b *testing.B) {
 }
 
 func BenchmarkEntityReplaceOld(b *testing.B) {
-	c1 := NewComponent1(1)
-	c2 := NewComponent2(1.0)
-	c3 := NewComponent3()
+	c1 := NewComponentA(1)
+	c2 := NewComponentB(1.0)
+	c3 := NewComponentC()
 	e := NewEntity(0)
 	e.AddComponent(c1, c2, c3)
 	for n := 0; n < b.N; n++ {
@@ -216,20 +216,20 @@ func BenchmarkEntityReplaceOld(b *testing.B) {
 }
 
 func BenchmarkEntityRemoveComponents(b *testing.B) {
-	c1 := NewComponent1(1)
-	c2 := NewComponent2(1.0)
-	c3 := NewComponent3()
+	c1 := NewComponentA(1)
+	c2 := NewComponentB(1.0)
+	c3 := NewComponentC()
 	e := NewEntity(0)
 	e.AddComponent(c1, c2, c3)
 	for n := 0; n < b.N; n++ {
-		e.RemoveComponent(IndexComponent1, IndexComponent2, IndexComponent3)
+		e.RemoveComponent(ComponentA, ComponentB, ComponentC)
 	}
 }
 
 func BenchmarkEntityRemoveAll(b *testing.B) {
-	c1 := NewComponent1(1)
-	c2 := NewComponent2(1.0)
-	c3 := NewComponent3()
+	c1 := NewComponentA(1)
+	c2 := NewComponentB(1.0)
+	c3 := NewComponentC()
 	e := NewEntity(0)
 	e.AddComponent(c1, c2, c3)
 	for n := 0; n < b.N; n++ {

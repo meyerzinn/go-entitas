@@ -10,66 +10,67 @@ import (
 // Component index
 
 const (
-	IndexComponent1 ComponentType = iota
-	IndexComponent2
-	IndexComponent3
-	IndexLength
+	ComponentA ComponentType = iota
+	ComponentB
+	ComponentC
+	ComponentD
+	ComponentE
+	ComponentF
+	NumComponents
 )
 
-// Component 1
+// --- A ----------------------------------------------------------------------
 
-type component1 struct {
+type componentA struct {
 	value int
 }
 
-func NewComponent1(value int) Component {
-	return &component1{value: value}
-}
+func NewComponentA(value int) Component    { return &componentA{value: value} }
+func (c1 *componentA) Type() ComponentType { return ComponentA }
+func (c1 *componentA) String() string      { return "A" }
 
-func (c1 *component1) Type() ComponentType {
-	return IndexComponent1
-}
+// --- B ----------------------------------------------------------------------
 
-func (c1 *component1) String() string {
-	return "Component1"
-}
+type componentB struct{ value float32 }
 
-// Component 2
+func NewComponentB(value float32) Component { return &componentB{value: value} }
+func (c2 *componentB) Type() ComponentType  { return ComponentB }
+func (c2 *componentB) String() string       { return "B" }
 
-type component2 struct {
-	value float32
-}
+// --- C ----------------------------------------------------------------------
 
-func NewComponent2(value float32) Component {
-	return &component2{value: value}
-}
+type componentC struct{}
 
-func (c2 *component2) Type() ComponentType {
-	return IndexComponent2
-}
+func NewComponentC() Component            { return &componentC{} }
+func (c *componentC) Type() ComponentType { return ComponentC }
 
-func (c2 *component2) String() string {
-	return "Component2"
-}
+// --- D ----------------------------------------------------------------------
 
-// Component 3
+type componentD struct{}
 
-type component3 struct{}
+func NewComponentD() Component            { return &componentD{} }
+func (d *componentD) Type() ComponentType { return ComponentD }
 
-func NewComponent3() Component {
-	return &component3{}
-}
+// --- E ----------------------------------------------------------------------
 
-func (c *component3) Type() ComponentType {
-	return IndexComponent3
-}
+type componentE struct{}
 
-// Tests
+func NewComponentE() Component            { return &componentE{} }
+func (e *componentE) Type() ComponentType { return ComponentE }
+
+// --- F ----------------------------------------------------------------------
+
+type componentF struct{}
+
+func NewComponentF() Component            { return &componentF{} }
+func (f *componentF) Type() ComponentType { return ComponentF }
+
+// --- Tests ------------------------------------------------------------------
 
 func TestComponentSorting(t *testing.T) {
 	Convey("Given components and a component list", t, func() {
-		c1 := NewComponent1(1)
-		c2 := NewComponent2(0.0)
+		c1 := NewComponentA(1)
+		c2 := NewComponentB(0.0)
 		components := []Component{c2, c1}
 
 		Convey("It should be sortable by type", func() {

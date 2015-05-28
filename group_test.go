@@ -9,9 +9,9 @@ import (
 func TestGroup(t *testing.T) {
 
 	Convey("Given a new group matching all of one component", t, func() {
-		g := NewGroup(AllOf(IndexComponent1))
+		g := NewGroup(AllOf(ComponentA))
 		e1 := NewEntity(0)
-		e1.AddComponent(NewComponent1(5))
+		e1.AddComponent(NewComponentA(5))
 
 		Convey("It gets empty group for matcher when no entities were created", func() {
 			So(g.Entities(), ShouldBeEmpty)
@@ -43,7 +43,7 @@ func TestGroup(t *testing.T) {
 		})
 
 		Convey("When non-matching entity is added", func() {
-			e1.RemoveComponent(IndexComponent1)
+			e1.RemoveComponent(ComponentA)
 			g.HandleEntity(e1)
 
 			Convey("The entity should not be in the group's entities", func() {
@@ -53,7 +53,7 @@ func TestGroup(t *testing.T) {
 
 		Convey("When an matching entity component is removed", func() {
 			g.HandleEntity(e1)
-			e1.RemoveComponent(IndexComponent1)
+			e1.RemoveComponent(ComponentA)
 			g.HandleEntity(e1)
 
 			Convey("The entity should not be in the group's entities", func() {
@@ -64,11 +64,11 @@ func TestGroup(t *testing.T) {
 	})
 
 	Convey("Given a new group matching all of two component", t, func() {
-		g := NewGroup(AllOf(IndexComponent1, IndexComponent2))
+		g := NewGroup(AllOf(ComponentA, ComponentB))
 		e1 := NewEntity(0)
-		e1.AddComponent(NewComponent1(5))
-		e1.AddComponent(NewComponent3())
-		e1.AddComponent(NewComponent2(5))
+		e1.AddComponent(NewComponentA(5))
+		e1.AddComponent(NewComponentC())
+		e1.AddComponent(NewComponentB(5))
 
 		Convey("When entity is added", func() {
 			g.HandleEntity(e1)
@@ -81,9 +81,9 @@ func TestGroup(t *testing.T) {
 }
 
 func BenchmarkGroupHandleEntity(b *testing.B) {
-	c1 := NewComponent1(1)
-	c2 := NewComponent2(1.0)
-	g := NewGroup(AllOf(IndexComponent1, IndexComponent2))
+	c1 := NewComponentA(1)
+	c2 := NewComponentB(1.0)
+	g := NewGroup(AllOf(ComponentA, ComponentB))
 
 	e := &entity{
 		id:         0,

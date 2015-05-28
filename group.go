@@ -3,6 +3,9 @@ package entitas
 type Group interface {
 	Entities() []Entity
 	HandleEntity(e Entity)
+	UpdateEntity(e Entity)
+	WillRemoveEntity(e Entity)
+	Matches(e Entity) bool
 	ContainsEntity(e Entity) bool
 	AddCallback(e GroupEvent, c GroupCallback)
 }
@@ -11,6 +14,7 @@ type GroupEvent uint
 
 const (
 	EntityAdded GroupEvent = iota
+	EntityWillBeRemoved
 	EntityRemoved
 )
 
@@ -51,6 +55,23 @@ func (g *group) HandleEntity(e Entity) {
 	} else {
 		g.removeEntity(e)
 	}
+}
+
+func (g *group) UpdateEntity(e Entity) {
+	if _, ok := g.entities[e.ID()]; ok {
+		g.callback(EntityRemoved, e)
+		g.callback(EntityAdded, e)
+	}
+}
+
+func (g *group) WillRemoveEntity(e Entity) {
+	if _, ok := g.entities[e.ID()]; ok {
+		g.callback(EntityWillBeRemoved, e)
+	}
+}
+
+func (g *group) Matches(e Entity) bool {
+	return g.matcher.Matches(e)
 }
 
 func (g *group) ContainsEntity(e Entity) bool {

@@ -16,6 +16,7 @@ type EntityID uint
 type Entity interface {
 	AddComponent(cs ...Component) error
 	ReplaceComponent(cs ...Component)
+	WillRemoveComponent(ts ...ComponentType) error
 	RemoveComponent(ts ...ComponentType) error
 	RemoveAllComponents()
 	AddCallback(ev ComponentEvent, cb ComponentCallback)
@@ -33,6 +34,7 @@ type ComponentEvent uint
 const (
 	ComponentAdded ComponentEvent = iota
 	ComponentReplaced
+	ComponentWillBeRemoved
 	ComponentRemoved
 )
 
@@ -73,6 +75,17 @@ func (e *entity) ReplaceComponent(cs ...Component) {
 			e.callback(ComponentAdded, c)
 		}
 	}
+}
+
+func (e *entity) WillRemoveComponent(ts ...ComponentType) error {
+	for _, t := range ts {
+		c, err := e.Component(t)
+		if err != nil {
+			return err
+		}
+		e.callback(ComponentWillBeRemoved, c)
+	}
+	return nil
 }
 
 func (e *entity) RemoveComponent(ts ...ComponentType) error {

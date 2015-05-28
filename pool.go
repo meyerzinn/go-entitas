@@ -16,7 +16,9 @@ type pool struct {
 	index            int
 	componentsLength ComponentType
 	entities         map[EntityID]Entity
+	cache            []Entity
 	groups           map[MatcherHash]Group
+	unused           []Entity
 }
 
 func NewPool(componentsLength ComponentType, index int) Pool {
@@ -25,17 +27,15 @@ func NewPool(componentsLength ComponentType, index int) Pool {
 		componentsLength: componentsLength,
 		entities:         make(map[EntityID]Entity),
 		groups:           make(map[MatcherHash]Group),
+		unused:           make([]Entity, 0),
 	}
 }
 
 func (p *pool) CreateEntity(cs ...Component) Entity {
-	e := NewEntity(p.index)
+	e := p.getEntity()
 	e.AddComponent(cs...)
 	p.entities[e.ID()] = e
-	p.index++
-	e.AddCallback(ComponentAdded, p.componentAddedCallback)
-	e.AddCallback(ComponentReplaced, p.componentReplacedCallback)
-	e.AddCallback(ComponentRemoved, p.componentRemovedCallback)
+	p.cache = append(p.cache, e)
 	for _, g := range p.groups {
 		g.HandleEntity(e)
 	}
@@ -43,11 +43,15 @@ func (p *pool) CreateEntity(cs ...Component) Entity {
 }
 
 func (p *pool) Entities() []Entity {
-	entities := make([]Entity, 0, len(p.entities))
-	for _, e := range p.entities {
-		entities = append(entities, e)
+	if p.cache == nil {
+		entities := make([]Entity, len(p.entities))
+		i := 0
+		for _, e := range p.entities {
+			entities[i] = e
+		}
+		p.cache = entities
 	}
-	return entities
+	return p.cache
 }
 
 func (p *pool) Count() int {
@@ -65,9 +69,11 @@ func (p *pool) DestroyEntity(e Entity) {
 	if entity, ok := p.entities[e.ID()]; ok && entity == e {
 		e.RemoveAllComponents()
 		delete(p.entities, e.ID())
+		p.cache = nil
 		for _, g := range p.groups {
 			g.HandleEntity(e)
 		}
+		p.unused = append(p.unused, e)
 		return
 	}
 	panic("unknown entity")
@@ -78,6 +84,7 @@ func (p *pool) DestroyAllEntities() {
 		e.RemoveAllComponents()
 	}
 	p.entities = make(map[EntityID]Entity)
+	p.cache = nil
 }
 
 func (p *pool) Group(m Matcher) Group {
@@ -98,15 +105,53 @@ func (p *pool) String() string {
 }
 
 func (p *pool) componentAddedCallback(e Entity, c Component) {
-	for _, g := range p.groups {
-		g.HandleEntity(e)
+	if p.HasEntity(e) {
+		for _, g := range p.groups {
+			g.HandleEntity(e)
+		}
 	}
 }
 
-func (p *pool) componentReplacedCallback(e Entity, c Component) {}
+func (p *pool) componentReplacedCallback(e Entity, c Component) {
+	if p.HasEntity(e) {
+		for _, g := range p.groups {
+			g.UpdateEntity(e)
+		}
+	}
+}
+
+func (p *pool) componentWillBeRemovedCallback(e Entity, c Component) {
+	if p.HasEntity(e) {
+		for _, g := range p.groups {
+			delete(e.(*entity).components, c.Type())
+			if !g.Matches(e) {
+				e.(*entity).components[c.Type()] = c
+				g.WillRemoveEntity(e)
+			}
+		}
+	}
+}
 
 func (p *pool) componentRemovedCallback(e Entity, c Component) {
-	for _, g := range p.groups {
-		g.HandleEntity(e)
+	if p.HasEntity(e) {
+		for _, g := range p.groups {
+			g.HandleEntity(e)
+		}
 	}
+}
+
+func (p *pool) getEntity() Entity {
+	var e Entity
+	if len(p.unused) > 0 {
+		e = p.unused[0]
+		p.unused = p.unused[1:]
+	} else {
+		e = NewEntity(p.index)
+		p.index++
+		e.AddCallback(ComponentAdded, p.componentAddedCallback)
+		e.AddCallback(ComponentReplaced, p.componentReplacedCallback)
+		e.AddCallback(ComponentWillBeRemoved, p.componentWillBeRemovedCallback)
+		e.AddCallback(ComponentRemoved, p.componentRemovedCallback)
+	}
+	return e
 }
