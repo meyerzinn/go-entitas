@@ -102,7 +102,7 @@ func TestGroupObserver(t *testing.T) {
 
 				So(observer.CollectedEntities(), ShouldResemble, []Entity{entity})
 
-            observer.ClearCollectedEntities()
+				observer.ClearCollectedEntities()
 				entity.RemoveComponent(ComponentA)
 
 				So(observer.CollectedEntities(), ShouldResemble, []Entity{entity})
