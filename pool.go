@@ -18,6 +18,7 @@ type pool struct {
 	entities         map[EntityID]Entity
 	cache            []Entity
 	groups           map[MatcherHash]Group
+	groupsIndex      map[ComponentType][]Group
 	unused           []Entity
 }
 
@@ -27,6 +28,7 @@ func NewPool(componentsLength ComponentType, index int) Pool {
 		componentsLength: componentsLength,
 		entities:         make(map[EntityID]Entity),
 		groups:           make(map[MatcherHash]Group),
+		groupsIndex:      make(map[ComponentType][]Group),
 		unused:           make([]Entity, 0),
 	}
 }
@@ -97,6 +99,11 @@ func (p *pool) Group(m Matcher) Group {
 		g.HandleEntity(e)
 	}
 	p.groups[m.Hash()] = g
+
+	for _, component := range m.ComponentTypes() {
+		p.groupsIndex[component] = append(p.groupsIndex[component], g)
+	}
+
 	return g
 }
 
@@ -105,39 +112,31 @@ func (p *pool) String() string {
 }
 
 func (p *pool) componentAddedCallback(e Entity, c Component) {
-	if p.HasEntity(e) {
-		for _, g := range p.groups {
-			g.HandleEntity(e)
-		}
-	}
+	p.forMatchingGroups(e, c, func(g Group) {
+		g.HandleEntity(e)
+	})
 }
 
 func (p *pool) componentReplacedCallback(e Entity, c Component) {
-	if p.HasEntity(e) {
-		for _, g := range p.groups {
-			g.UpdateEntity(e)
-		}
-	}
+	p.forMatchingGroups(e, c, func(g Group) {
+		g.UpdateEntity(e)
+	})
 }
 
 func (p *pool) componentWillBeRemovedCallback(e Entity, c Component) {
-	if p.HasEntity(e) {
-		for _, g := range p.groups {
-			delete(e.(*entity).components, c.Type())
-			if !g.Matches(e) {
-				e.(*entity).components[c.Type()] = c
-				g.WillRemoveEntity(e)
-			}
+	p.forMatchingGroups(e, c, func(g Group) {
+		delete(e.(*entity).components, c.Type())
+		if !g.Matches(e) {
+			e.(*entity).components[c.Type()] = c
+			g.WillRemoveEntity(e)
 		}
-	}
+	})
 }
 
 func (p *pool) componentRemovedCallback(e Entity, c Component) {
-	if p.HasEntity(e) {
-		for _, g := range p.groups {
-			g.HandleEntity(e)
-		}
-	}
+	p.forMatchingGroups(e, c, func(g Group) {
+		g.HandleEntity(e)
+	})
 }
 
 func (p *pool) getEntity() Entity {
@@ -154,4 +153,12 @@ func (p *pool) getEntity() Entity {
 		e.AddCallback(ComponentRemoved, p.componentRemovedCallback)
 	}
 	return e
+}
+
+func (p *pool) forMatchingGroups(e Entity, c Component, f func(g Group)) {
+	if p.HasEntity(e) {
+		for _, g := range p.groupsIndex[c.Type()] {
+			f(g)
+		}
+	}
 }

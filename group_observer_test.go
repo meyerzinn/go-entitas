@@ -108,5 +108,22 @@ func TestGroupObserver(t *testing.T) {
 				So(observer.CollectedEntities(), ShouldResemble, []Entity{entity})
 			})
 		})
+
+		Convey("When observing with 2 Groups of different Component types", func() {
+			_ = pool.Group(AllOf(ComponentB))
+			observer := NewGroupObserver(group, ObserverEntityAdded)
+
+			Convey("It should only collect entities from the observed group", func() {
+				entity := pool.CreateEntity()
+				entity.AddComponent(NewComponentA(1))
+				entity.AddComponent(NewComponentB(1.0))
+
+				observer.ClearCollectedEntities()
+
+				entity.ReplaceComponent(NewComponentB(1.5))
+
+				So(observer.CollectedEntities(), ShouldBeEmpty)
+			})
+		})
 	})
 }
