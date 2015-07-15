@@ -21,23 +21,25 @@ const (
 type GroupCallback func(Group, Entity)
 
 type group struct {
-	entities  map[EntityID]Entity
-	cache     []Entity
-	matcher   Matcher
-	callbacks map[GroupEvent][]GroupCallback
+	entities         map[EntityID]Entity
+	cache            []Entity
+	cacheInvalidated bool
+	matcher          Matcher
+	callbacks        map[GroupEvent][]GroupCallback
 }
 
 func NewGroup(matcher Matcher) Group {
 	return &group{
-		entities:  make(map[EntityID]Entity),
-		cache:     make([]Entity, 0),
-		matcher:   matcher,
-		callbacks: make(map[GroupEvent][]GroupCallback),
+		entities:         make(map[EntityID]Entity),
+		cache:            make([]Entity, 0),
+		cacheInvalidated: false,
+		matcher:          matcher,
+		callbacks:        make(map[GroupEvent][]GroupCallback),
 	}
 }
 
 func (g *group) Entities() []Entity {
-	if g.cache == nil {
+	if g.cacheInvalidated {
 		cache := make([]Entity, len(g.entities))
 		i := 0
 		for _, e := range g.entities {
@@ -45,6 +47,7 @@ func (g *group) Entities() []Entity {
 			i++
 		}
 		g.cache = cache
+		g.cacheInvalidated = false
 	}
 	return g.cache
 }
@@ -92,7 +95,9 @@ func (g *group) AddCallback(ev GroupEvent, c GroupCallback) {
 func (g *group) addEntity(e Entity) {
 	if _, ok := g.entities[e.ID()]; !ok {
 		g.entities[e.ID()] = e
-		g.cache = append(g.cache, e)
+		if g.cacheInvalidated == false {
+			g.cache = append(g.cache, e)
+		}
 		g.callback(EntityAdded, e)
 	}
 }
@@ -102,6 +107,7 @@ func (g *group) removeEntity(e Entity) {
 		delete(g.entities, e.ID())
 		if i := findIndex(g.cache, e); i != -1 {
 			g.cache = nil
+			g.cacheInvalidated = true
 		}
 		g.callback(EntityRemoved, e)
 	}

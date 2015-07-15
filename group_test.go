@@ -76,6 +76,10 @@ func TestGroup(t *testing.T) {
 							So(g.ContainsEntity(e2), ShouldBeTrue)
 							So(g.ContainsEntity(e3), ShouldBeTrue)
 						})
+
+						Convey("It should return the old and new entity", func() {
+							So(g.Entities(), ShouldResemble, []Entity{e3, e2})
+						})
 					})
 				})
 			})
