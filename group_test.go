@@ -40,6 +40,45 @@ func TestGroup(t *testing.T) {
 				g.HandleEntity(e1)
 				So(g.ContainsEntity(e1), ShouldBeTrue)
 			})
+
+			Convey("When another entity is added", func() {
+				e2 := NewEntity(1)
+				e2.AddComponent(NewComponentA(5))
+				g.HandleEntity(e2)
+
+				Convey("It should contain the matching entities", func() {
+					So(g.ContainsEntity(e1), ShouldBeTrue)
+					So(g.ContainsEntity(e2), ShouldBeTrue)
+				})
+
+				Convey("It should return the matching entities", func() {
+					So(g.Entities(), ShouldResemble, []Entity{e1, e2})
+				})
+
+				Convey("When removing one entity", func() {
+					e1.RemoveComponent(ComponentA)
+					g.HandleEntity(e1)
+
+					Convey("It should still contain the other entity", func() {
+						So(g.ContainsEntity(e2), ShouldBeTrue)
+					})
+
+					Convey("It should still return the other entity", func() {
+						So(g.Entities(), ShouldResemble, []Entity{e2})
+					})
+
+					Convey("When yet another entity is added", func() {
+						e3 := NewEntity(2)
+						e3.AddComponent(NewComponentA(5))
+						g.HandleEntity(e3)
+
+						Convey("It should contain the old and new entity", func() {
+							So(g.ContainsEntity(e2), ShouldBeTrue)
+							So(g.ContainsEntity(e3), ShouldBeTrue)
+						})
+					})
+				})
+			})
 		})
 
 		Convey("When non-matching entity is added", func() {
