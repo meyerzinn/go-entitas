@@ -119,7 +119,39 @@ func TestGroup(t *testing.T) {
 	})
 }
 
-func BenchmarkGroupHandleEntity(b *testing.B) {
+func BenchmarkGroupAddEntity(b *testing.B) {
+	BenchGroup(b, func(e *entity, g Group) {
+		e.id = EntityID(1000)
+		g.HandleEntity(e)
+	})
+}
+
+func BenchmarkGroupRemoveEntity(b *testing.B) {
+	BenchGroup(b, func(e *entity, g Group) {
+		e.id = EntityID(500)
+		Entity(e).RemoveComponent(ComponentA)
+		g.HandleEntity(e)
+	})
+}
+
+func BenchmarkGroupEntities(b *testing.B) {
+	BenchGroup(b, func(e *entity, g Group) {
+		e.id = EntityID(500)
+		Entity(e).RemoveComponent(ComponentA)
+		g.HandleEntity(e)
+
+		g.Entities()
+	})
+}
+
+func BenchmarkGroupContainsEntity(b *testing.B) {
+	BenchGroup(b, func(e *entity, g Group) {
+		e.id = EntityID(500)
+		g.ContainsEntity(e)
+	})
+}
+
+func BenchGroup(b *testing.B, f func(*entity, Group)) {
 	c1 := NewComponentA(1)
 	c2 := NewComponentB(1.0)
 	g := NewGroup(AllOf(ComponentA, ComponentB))
@@ -130,8 +162,13 @@ func BenchmarkGroupHandleEntity(b *testing.B) {
 		callbacks:  make(map[ComponentEvent][]ComponentCallback),
 	}
 	Entity(e).AddComponent(c1, c2)
-	for n := 0; n < b.N; n++ {
-		e.id = EntityID(n % 100) // Add and remove 100 different entities
+
+	for i := 0; i < 1000; i++ {
+		e.id = EntityID(i)
 		g.HandleEntity(e)
+	}
+
+	for n := 0; n < b.N; n++ {
+		f(e, g)
 	}
 }
