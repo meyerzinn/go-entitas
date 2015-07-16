@@ -123,6 +123,54 @@ func TestEntity(t *testing.T) {
 			So(err.Error(), ShouldEqual, "component does not exist")
 		})
 
+		Convey("When adding a component", func() {
+			willBeRemoved := false
+			removed := false
+			e.AddComponent(c1)
+
+			e.AddCallback(ComponentWillBeRemoved, func(e Entity, c Component) {
+				willBeRemoved = true
+			})
+
+			e.AddCallback(ComponentRemoved, func(e Entity, c Component) {
+				removed = true
+			})
+
+			Convey("When removing this component", func() {
+				e.RemoveComponent(c1.Type())
+
+				Convey("It should call OnComponentWillBeRemoved", func() {
+					So(willBeRemoved, ShouldBeTrue)
+				})
+			})
+
+			Convey("When removing all components", func() {
+				e.RemoveAllComponents()
+
+				Convey("It should call OnComponentWillBeRemoved", func() {
+					So(willBeRemoved, ShouldBeTrue)
+				})
+
+				Convey("It should call OnComponentRemoved", func() {
+					So(removed, ShouldBeTrue)
+				})
+			})
+
+			Convey("When removing a component it does not contain", func() {
+				e.RemoveComponent(c2.Type())
+
+				Convey("It should not call OnComponentWillBeRemoved", func() {
+					So(willBeRemoved, ShouldBeFalse)
+				})
+
+				Convey("It should not call OnComponentRemoved", func() {
+					So(removed, ShouldBeFalse)
+				})
+			})
+		})
+
+		// Convey("dispatches OnComponentWillBeRemoved when called manually and component exists", func() {})
+
 		Convey("It can be printed", func() {
 			e.AddComponent(c1, c2)
 			So(fmt.Sprintf("%v", e), ShouldEqual, "Entity_0([A B])")
