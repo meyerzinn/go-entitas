@@ -19,7 +19,9 @@ type Entity interface {
 	WillRemoveComponent(ts ...ComponentType) error
 	RemoveComponent(ts ...ComponentType) error
 	RemoveAllComponents()
+	RemoveAllCallbacks()
 	AddCallback(ev ComponentEvent, cb ComponentCallback)
+	HasCallbacks() bool
 
 	ID() EntityID
 	HasComponent(ts ...ComponentType) bool
@@ -125,6 +127,14 @@ func (e *entity) AddCallback(ev ComponentEvent, cb ComponentCallback) {
 		cbs = make([]ComponentCallback, 0)
 	}
 	e.callbacks[ev] = append(cbs, cb)
+}
+
+func (e *entity) HasCallbacks() bool {
+	return len(e.callbacks) > 0
+}
+
+func (e *entity) RemoveAllCallbacks() {
+	e.callbacks = make(map[ComponentEvent][]ComponentCallback)
 }
 
 func (e *entity) HasComponent(ts ...ComponentType) bool {

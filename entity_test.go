@@ -187,6 +187,7 @@ func TestEntity(t *testing.T) {
 			var removed_e Entity
 			var removed_c Component
 			c := NewComponentA(0)
+
 			e.AddCallback(ComponentAdded, func(e Entity, c Component) {
 				added = true
 				added_e = e
@@ -226,10 +227,19 @@ func TestEntity(t *testing.T) {
 				})
 			})
 
+			Convey("When removing all callbacks", func() {
+				e.RemoveAllCallbacks()
+
+				Convey("When a component is added", func() {
+					e.AddComponent(c)
+
+					Convey("It should not be called when added", func() {
+						So(added, ShouldBeFalse)
+					})
+				})
+			})
 		})
-
 	})
-
 }
 
 func BenchmarkEntityAddComponents(b *testing.B) {
