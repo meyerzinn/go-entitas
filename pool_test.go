@@ -63,6 +63,12 @@ func TestPool(t *testing.T) {
 			So(e.Components(), ShouldBeEmpty)
 		})
 
+		Convey("It destroys an entity and removes all callbacks", func() {
+			e := p.CreateEntity()
+			p.DestroyEntity(e)
+			So(e.HasCallbacks(), ShouldBeFalse)
+		})
+
 		Convey("It destroys all entites", func() {
 			e := p.CreateEntity()
 			e.AddComponent(NewComponentA(1))
@@ -70,6 +76,7 @@ func TestPool(t *testing.T) {
 			p.DestroyAllEntities()
 			So(p.Entities(), ShouldBeEmpty)
 			So(e.Components(), ShouldBeEmpty)
+			So(e.HasCallbacks(), ShouldBeFalse)
 		})
 
 		// TODO: Possible in Go?

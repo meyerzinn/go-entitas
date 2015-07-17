@@ -70,6 +70,7 @@ func (p *pool) HasEntity(e Entity) bool {
 func (p *pool) DestroyEntity(e Entity) {
 	if entity, ok := p.entities[e.ID()]; ok && entity == e {
 		e.RemoveAllComponents()
+		e.RemoveAllCallbacks()
 		delete(p.entities, e.ID())
 		p.cache = nil
 		for _, g := range p.groups {
@@ -84,6 +85,7 @@ func (p *pool) DestroyEntity(e Entity) {
 func (p *pool) DestroyAllEntities() {
 	for _, e := range p.entities {
 		e.RemoveAllComponents()
+		e.RemoveAllCallbacks()
 	}
 	p.entities = make(map[EntityID]Entity)
 	p.cache = nil
@@ -147,11 +149,11 @@ func (p *pool) getEntity() Entity {
 	} else {
 		e = NewEntity(p.index)
 		p.index++
-		e.AddCallback(ComponentAdded, p.componentAddedCallback)
-		e.AddCallback(ComponentReplaced, p.componentReplacedCallback)
-		e.AddCallback(ComponentWillBeRemoved, p.componentWillBeRemovedCallback)
-		e.AddCallback(ComponentRemoved, p.componentRemovedCallback)
 	}
+	e.AddCallback(ComponentAdded, p.componentAddedCallback)
+	e.AddCallback(ComponentReplaced, p.componentReplacedCallback)
+	e.AddCallback(ComponentWillBeRemoved, p.componentWillBeRemovedCallback)
+	e.AddCallback(ComponentRemoved, p.componentRemovedCallback)
 	return e
 }
 
