@@ -94,6 +94,7 @@ func (e *entity) RemoveComponent(ts ...ComponentType) error {
 		if err != nil {
 			return err
 		}
+		e.callback(ComponentWillBeRemoved, c)
 		delete(e.components, t)
 		e.callback(ComponentRemoved, c)
 	}
@@ -102,7 +103,13 @@ func (e *entity) RemoveComponent(ts ...ComponentType) error {
 
 func (e *entity) RemoveAllComponents() {
 	components := e.components
+
+	for _, c := range components {
+		e.callback(ComponentWillBeRemoved, c)
+	}
+
 	e.components = make(map[ComponentType]Component)
+
 	for _, c := range components {
 		e.callback(ComponentRemoved, c)
 	}
